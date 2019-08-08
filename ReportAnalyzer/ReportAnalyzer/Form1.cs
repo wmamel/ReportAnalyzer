@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using ClosedXML.Excel;
 
 namespace ReportAnalyzer
 {
@@ -20,6 +21,11 @@ namespace ReportAnalyzer
         private void button2_Click(object sender, EventArgs e)
         {
             fghfgh
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

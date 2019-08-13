@@ -23,17 +23,17 @@ namespace ReportAnalyzer
         private IXLWorksheet empWs;
        // private List<Tuple<DateTime, string, string, string, double, string>> trackerRecords;
         //private List<Tuple<DateTime, string, string, double, string>> empRecords;
-        private List<Tuple<DateTime, string, string, double, string>> empRecords = new List<Tuple<DateTime, string, string, double, string>>();
-        private List<Tuple<DateTime, string, string, string, double, string>> trackerRecords = new List<Tuple<DateTime, string, string, string, double, string>>();
+        private List<Tuple<DateTime, string, double, string, string>> empRecords = new List<Tuple<DateTime, string, double, string, string>>();
+        private List<Tuple<DateTime, string, double, string, string>> trackerRecords = new List<Tuple<DateTime, string, double, string, string>> ();
         private string[] trackerFiles;
         private string[] empFiles;
-        public List<Tuple<DateTime, string, string, string, double, string>> TrackerRecords { get
+        public List<Tuple<DateTime, string, double, string, string>> TrackerRecords { get
             {
                 return trackerRecords;
             }
         
         }
-        public List<Tuple<DateTime, string, string, double, string>> EmpRecords { get
+        public List<Tuple<DateTime, string, double, string, string>> EmpRecords { get
             {
                 return empRecords;
             }
@@ -45,8 +45,8 @@ namespace ReportAnalyzer
             MessageBox.Show("Load");
             this.logger.LogOnScreen("LoadReports");
             ListFiles(trackerPath, empPath);
-            List<Tuple<DateTime, string, string, double, string>> empRecords = new List<Tuple<DateTime, string, string, double, string>>();
-            List<Tuple<DateTime, string, string, string, double, string>> trackerRecords = new List<Tuple<DateTime, string, string, string, double, string>>();
+            List<Tuple<DateTime, string, double, string, string>> empRecords = new List<Tuple<DateTime, string, double, string, string>>();
+            List<Tuple<DateTime, string, double, string, string>> trackerRecords = new List<Tuple<DateTime, string, double, string, string>>();
             foreach (string trackerReportFile in trackerFiles)
             {
                 LoadTrackerExcel(trackerReportFile);
@@ -115,7 +115,7 @@ namespace ReportAnalyzer
                 }
             }
         }
-        private Tuple<DateTime, string, string, double, string> LoadEmpLine(int rowNumber, string path)
+        private Tuple<DateTime, string, double, string, string> LoadEmpLine(int rowNumber, string path)
         {
             
             DateTime date;
@@ -141,10 +141,50 @@ namespace ReportAnalyzer
                 return null;
             }
 
-            return Tuple.Create(date, cc, project, time, employee);
+            return Tuple.Create(date, cc, time, employee, project);
             
         }
 
+        
+
+        private Tuple<DateTime, string, double, string, string> LoadTrackerLine(int rowNumber, string path)
+        {
+            DateTime date;
+            string cc;
+            string project;
+            string jobType;
+            double time;
+            string employee;
+            if (!trackerWs.Row(rowNumber).Cell(1).IsEmpty())
+            {
+
+
+                try
+                {
+                    //date = trackerWs.Row(rowNumber).Cell(1).GetDateTime();
+                    date = trackerWs.Row(rowNumber).Cell(1).GetDateTime();
+                    cc = trackerWs.Row(rowNumber).Cell(2).GetString();
+                    project = trackerWs.Row(rowNumber).Cell(3).GetString();
+                    //jobType = trackerWs.Row(rowNumber).Cell(4).GetString();
+                    time = trackerWs.Row(rowNumber).Cell(5).GetDouble();
+                    employee = GetEmployeeFromPath(path);
+                }
+                catch (Exception e)
+                {
+                    logger.LogOnScreen(path + " " + e.Message);
+                    return null;
+
+                }
+                return Tuple.Create(date, cc, time, employee, project);
+            }
+            else
+            {
+                return null;
+            }
+                
+
+
+        }
         private string GetEmployeeFromPath(string path)
         {
             string filename = Path.GetFileNameWithoutExtension(path);
@@ -196,45 +236,6 @@ namespace ReportAnalyzer
             {
                 return "Unknown";
             }
-
-
-        }
-
-        private Tuple<DateTime, string, string,string,double, string> LoadTrackerLine(int rowNumber, string path)
-        {
-            DateTime date;
-            string cc;
-            string project;
-            string jobType;
-            double time;
-            string employee;
-            if (!trackerWs.Row(rowNumber).Cell(1).IsEmpty())
-            {
-
-
-                try
-                {
-                    //date = trackerWs.Row(rowNumber).Cell(1).GetDateTime();
-                    date = trackerWs.Row(rowNumber).Cell(1).GetDateTime();
-                    cc = trackerWs.Row(rowNumber).Cell(2).GetString();
-                    project = trackerWs.Row(rowNumber).Cell(3).GetString();
-                    jobType = trackerWs.Row(rowNumber).Cell(4).GetString();
-                    time = trackerWs.Row(rowNumber).Cell(5).GetDouble();
-                    employee = GetEmployeeFromPath(path);
-                }
-                catch (Exception e)
-                {
-                    logger.LogOnScreen(path + " " + e.Message);
-                    return null;
-
-                }
-                return Tuple.Create(date, cc, project, jobType, time, employee);
-            }
-            else
-            {
-                return null;
-            }
-                
 
 
         }

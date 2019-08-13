@@ -157,8 +157,6 @@ namespace ReportAnalyzer
             string employee;
             if (!trackerWs.Row(rowNumber).Cell(1).IsEmpty())
             {
-
-
                 try
                 {
                     //date = trackerWs.Row(rowNumber).Cell(1).GetDateTime();
@@ -173,7 +171,6 @@ namespace ReportAnalyzer
                 {
                     logger.LogOnScreen(path + " " + e.Message);
                     return null;
-
                 }
                 return Tuple.Create(date, cc, time, employee, project);
             }

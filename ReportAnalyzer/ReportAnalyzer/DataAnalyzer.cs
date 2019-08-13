@@ -13,29 +13,30 @@ namespace ReportAnalyzer
         private HashSet<string> setOfDates = new HashSet<string>();
         private HashSet<string> setOfCC = new  HashSet<string>();
 
-        private List<Tuple<DateTime, string, string, double, string>> empList = new List<Tuple<DateTime, string, string, double, string>>();
-        private List<Tuple<DateTime, string, string, string, double, string>> trackerList = new List<Tuple<DateTime, string, string, string, double, string>>();
+        private List<Tuple<DateTime, string, double, string, string>> empList = new List<Tuple<DateTime, string, double, string, string>>();
+        private List<Tuple<DateTime, string, double, string, string>> trackerList = new List<Tuple<DateTime, string, double, string, string>>();
 
-        public DataAnalyzer(List<Tuple<DateTime, string, string, double, string>> empRecords, List<Tuple<DateTime, string, string, string, double, string>> trackerRecords, Logger logger_imp)
+        public DataAnalyzer(List<Tuple<DateTime, string, double, string, string>> empRecords, List<Tuple<DateTime, string, double, string, string>> trackerRecords, Logger logger_imp)
         {
             this.empList = empRecords;
             this.trackerList = trackerRecords;
             this.logger = logger_imp;
+            CreateDataSets();
         }
         HashSet<string> myHashSet = new HashSet<string>();
 
         private void CreateDataSets()
         {
-            foreach (Tuple<DateTime, string, string, double, string> empLine in empList)
+            foreach (Tuple<DateTime, string, double, string, string> empLine in empList)
             {
                 setOfDates.Add(empLine.Item1.ToShortDateString());
-                setOfNames.Add(empLine.Item5);
+                setOfNames.Add(empLine.Item4);
                 setOfCC.Add(empLine.Item2.Trim());
             }
-            foreach (Tuple<DateTime, string, string, string, double, string> trackerLine in trackerList)
+            foreach (Tuple<DateTime, string, double, string, string> trackerLine in trackerList)
             {
                 setOfDates.Add(trackerLine.Item1.ToShortDateString());
-                setOfNames.Add(trackerLine.Item6);
+                setOfNames.Add(trackerLine.Item4);
                 setOfCC.Add(trackerLine.Item2.Trim());
 
             }
@@ -57,35 +58,33 @@ namespace ReportAnalyzer
             }
 
         }
-        public List<Tuple<string, string, double, string>> ReportccEmp(string cc)
+        public List<Tuple<string, string, double, string>> GetSummarizedTimes(List<Tuple<DateTime, string, double, string, string>> recordList, string date, string cc, string employee)
         {
-            CreateDataSets();
+            //CreateDataSets();
             List<Tuple<string, string, double, string>> ReportCCList = new List<Tuple<string, string, double, string>>();
-            foreach (string employee in setOfNames) 
+            double sum = new double();
+            foreach (Tuple<DateTime, string, double, string, string> reportLine in recordList)
             {
-                foreach (string date in setOfDates)
+                if ((reportLine.Item4 == employee) & (reportLine.Item1.ToShortDateString() == date) & cc.Trim().ToUpper() == reportLine.Item2.Trim().ToUpper())
                 {
-                    double sum = new double();
-                    foreach (Tuple<DateTime, string, string, double, string> empLine in empList)
-                    {
-                        if ((empLine.Item5==employee) & (empLine.Item1.ToShortDateString()==date) & cc.Trim().ToUpper()==empLine.Item2.Trim().ToUpper())
-                        {
-                            sum = sum + empLine.Item4;
-                        }
-
-                    }
-                    if (sum>0 )
-                    {
-                        ReportCCList.Add(Tuple.Create(employee, date, sum, cc));
-                    }
-                    
+                    sum = sum + reportLine.Item3;
                 }
             }
+            if (sum > 0)
+            {
+                ReportCCList.Add(Tuple.Create(date, cc, sum, employee));
+            }
             return ReportCCList;
-        }
-        public List<Tuple<string, string, double, string>> ReportdateEmp(string date)
-        {
 
         }
+        public List<Tuple<string, string, double, string>> GetListForCC(List<Tuple<DateTime, string, double, string, string>> recordList, string cc)
+        {
+            foreach(string costCode in setOfCC)
+            {
+
+            }
+        }
+
+
     }
 }

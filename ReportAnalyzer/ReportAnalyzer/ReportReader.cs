@@ -161,7 +161,7 @@ namespace ReportAnalyzer
                 {
                     //date = trackerWs.Row(rowNumber).Cell(1).GetDateTime();
                     date = trackerWs.Row(rowNumber).Cell(1).GetDateTime();
-                    cc = trackerWs.Row(rowNumber).Cell(2).GetString();
+                    cc = trackerWs.Row(rowNumber).Cell(2).GetString().Trim().Replace(" ", "");
                     project = trackerWs.Row(rowNumber).Cell(3).GetString();
                     //jobType = trackerWs.Row(rowNumber).Cell(4).GetString();
                     time = trackerWs.Row(rowNumber).Cell(5).GetDouble();

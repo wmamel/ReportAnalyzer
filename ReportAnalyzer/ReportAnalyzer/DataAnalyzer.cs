@@ -16,7 +16,7 @@ namespace ReportAnalyzer
 
         private List<Tuple<DateTime, string, double, string, string>> empList = new List<Tuple<DateTime, string, double, string, string>>();
         private List<Tuple<DateTime, string, double, string, string>> trackerList = new List<Tuple<DateTime, string, double, string, string>>();
-        private List<Tuple<string, string, double, string>> summrizedEmpList = new List<Tuple<string, string, double, string>>();
+        private List<Tuple<string, string, double, string>> summarizedEmpList = new List<Tuple<string, string, double, string>>();
         private List<Tuple<string, string, double, string>> summarizedTrackerList = new List<Tuple<string, string, double, string>>();
         public DataAnalyzer(List<Tuple<DateTime, string, double, string, string>> empRecords, List<Tuple<DateTime, string, double, string, string>> trackerRecords, Logger logger_imp)
         {
@@ -25,7 +25,7 @@ namespace ReportAnalyzer
             this.logger = logger_imp;
             CreateDataSets();
             setOfSelectedDates = setOfDates;
-            CreateSummarizedList(empList, summrizedEmpList);
+            CreateSummarizedList(empList, summarizedEmpList);
             CreateSummarizedList(trackerList, summarizedTrackerList);
 
         }
@@ -62,8 +62,62 @@ namespace ReportAnalyzer
                 logger.LogOnScreen(b + "\n");
 
             }
-        public void test_
 
+        }
+        public void test_2()
+        {
+            List<Tuple<string, string, double, string>> aa = new List<Tuple<string, string, double, string>>();
+            List<Tuple<string, string, double, string>> bb = new List<Tuple<string, string, double, string>>();
+            aa= GetSubListForGivenEmployee("Radoslaw Domian", GetSubListForGivenCC("PHI_MLMAQX_118", summarizedTrackerList));
+            bb=GetSubListForGivenEmployee("Radoslaw Domian", GetSubListForGivenCC("PHI_MLMAQX_118", summarizedEmpList));
+            int c =new int();
+
+            c++;
+            
+
+        }
+        public void check()
+        {
+            //sumuje czasy , tworzy liste bez duplikatow w danym dniu
+            double trackerTime = new double();
+            double empTime = new double();
+
+            foreach (string employee in setOfNames)
+            {
+                foreach (string date in setOfDates)
+                {
+                    foreach (string cc in setOfCC)
+                    {
+                        List<Tuple<string, string, double, string>> trackerList = new List<Tuple<string, string, double, string>>();
+                        List<Tuple<string, string, double, string>> empList = new List<Tuple<string, string, double, string>>();
+                        trackerTime = 0;
+                        empTime = 0;
+                        trackerList = GetSubListForGivenDate(date, GetSubListForGivenEmployee(employee, GetSubListForGivenCC(cc, summarizedTrackerList)));
+                        empList = GetSubListForGivenDate(date, GetSubListForGivenEmployee(employee, GetSubListForGivenCC(cc, summarizedEmpList)));
+                        //var empRecord = new Tuple<string, string, double, string>();
+                        // var trackerRecord;
+                        if (trackerList.Any())
+                        {
+                            //trackerRecord = trackerList.First();
+                            trackerTime = trackerList.First().Item3;
+                        }
+                        if (empList.Any())
+                        {
+                            //empRecord = empList.First();
+                            //empTime = empRecord.Item3;
+                            empTime = empList.First().Item3;
+                        }
+
+                        if (empTime>trackerTime)
+                        {
+                            logger.LogOnScreen(empList.First().Item1 + " "+ empList.First().Item2 + " " + empList.First().Item4  + empTime.ToString() + ">" + trackerTime.ToString()+"\n");
+                        }
+
+
+
+                    }
+                }
+            }
         }
         public List<Tuple<string, string, double, string>> GetSummarizedTime(List<Tuple<DateTime, string, double, string, string>> recordList, string date, string cc, string employee)
         {
@@ -92,8 +146,9 @@ namespace ReportAnalyzer
             {
                 foreach(string date in setOfDates)
                 {
-                    foreach(string cc in setOfCC)
+                    foreach (string cc in setOfCC)
                     {
+                        sum = 0;
                         foreach (Tuple<DateTime, string, double, string, string> recordLine in recordList)
                         {
                             if ((recordLine.Item4 == employee) & (recordLine.Item1.ToShortDateString() == date) & cc.Trim().ToUpper() == recordLine.Item2.Trim().ToUpper())

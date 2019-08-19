@@ -37,6 +37,8 @@ namespace ReportAnalyzer
             logger.LogOnScreen("Start");
             ReportReader.LoadReports(textBoxTracker.Text, textBoxEmp.Text);
             DataAnalyzer dataAnalyzer = new DataAnalyzer(ReportReader.EmpRecords, ReportReader.TrackerRecords, logger);
+            //dataAnalyzer.test_2();
+            dataAnalyzer.check();
             //dataAnalyzer.temp_list_data();
             //dataAnalyzer.ReportCCEmp("Engineering");
             //foreach (Tuple<DateTime, string, string, string, double, string> a in ReportReader.TrackerRecords)

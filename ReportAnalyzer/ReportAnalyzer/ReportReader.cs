@@ -42,8 +42,8 @@ namespace ReportAnalyzer
         public void LoadReports(string trackerPath, string empPath)
 
         {
-            MessageBox.Show("Load");
-            this.logger.LogOnScreen("LoadReports");
+           // MessageBox.Show("Load");
+            //this.logger.LogOnScreen("LoadReports");
             ListFiles(trackerPath, empPath);
             List<Tuple<DateTime, string, double, string, string>> empRecords = new List<Tuple<DateTime, string, double, string, string>>();
             List<Tuple<DateTime, string, double, string, string>> trackerRecords = new List<Tuple<DateTime, string, double, string, string>>();
@@ -83,7 +83,7 @@ namespace ReportAnalyzer
             {
                 //empRecords.Clear();
                 empWs = empWb.Worksheet(1);
-                for (int i = 2; i < empWs.LastRowUsed().RowNumber(); i++)
+                for (int i = 2; i < empWs.LastRowUsed().RowNumber()+1; i++)
                 //for (int i = 2; i < empWs.RowCount(); i++)
                 {
                     if (LoadEmpLine(i, path) != null)
@@ -103,7 +103,7 @@ namespace ReportAnalyzer
                 // trackerRecords.Clear();
                 trackerWs = trackerWb.Worksheet(1);
                 //for (int i = 2; i < trackerWs.RowCount(); i++)
-                for (int i = 2; i < trackerWs.LastRowUsed().RowNumber(); i++)
+                for (int i = 2; i < trackerWs.LastRowUsed().RowNumber()+1; i++)
 
                     {
                     if (LoadTrackerLine(i, path)!=null)
@@ -137,7 +137,7 @@ namespace ReportAnalyzer
             }
             catch (Exception e)
             {
-                logger.LogOnScreen(path + " " + e.Message);
+                logger.LogOnScreen(path + " " + e.Message + "\n");
                 return null;
             }
 
@@ -169,7 +169,7 @@ namespace ReportAnalyzer
                 }
                 catch (Exception e)
                 {
-                    logger.LogOnScreen(path + " " + e.Message);
+                    logger.LogOnScreen(path + " " + e.Message + "\n");
                     return null;
                 }
                 return Tuple.Create(date, cc, time, employee, project);

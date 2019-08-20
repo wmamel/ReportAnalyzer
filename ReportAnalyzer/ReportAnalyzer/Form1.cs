@@ -34,11 +34,11 @@ namespace ReportAnalyzer
             Logger logger = new Logger();
             ReportReader ReportReader = new ReportReader(logger);
             logger.passMsgToDisplay += OnMsgToDisplay;
-            logger.LogOnScreen("Start");
+            //logger.LogOnScreen("Start");
             ReportReader.LoadReports(textBoxTracker.Text, textBoxEmp.Text);
             DataAnalyzer dataAnalyzer = new DataAnalyzer(ReportReader.EmpRecords, ReportReader.TrackerRecords, logger);
             //dataAnalyzer.test_2();
-            dataAnalyzer.check();
+            dataAnalyzer.CompareEmpAndTra();
             //dataAnalyzer.temp_list_data();
             //dataAnalyzer.ReportCCEmp("Engineering");
             //foreach (Tuple<DateTime, string, string, string, double, string> a in ReportReader.TrackerRecords)
@@ -51,7 +51,18 @@ namespace ReportAnalyzer
             //textBox1.AppendText(a.Item6.ToString() + "\n");
             // }
             // textBox1.AppendText(ReportReader.TrackerRecords.ToString());
-            logger.LogOnScreen("Done");
+            //logger.LogOnScreen("Done");
+        }
+
+        private void button2_Click_1(object sender, EventArgs e)
+        {
+            Logger logger = new Logger();
+            ReportReader ReportReader = new ReportReader(logger);
+            logger.passMsgToDisplay += OnMsgToDisplay;
+            //logger.LogOnScreen("Start");
+            ReportReader.LoadReports(textBoxTracker.Text, textBoxEmp.Text);
+            DataAnalyzer dataAnalyzer = new DataAnalyzer(ReportReader.EmpRecords, ReportReader.TrackerRecords, logger);
+            dataAnalyzer.CreatePOReport();
         }
     }
 }

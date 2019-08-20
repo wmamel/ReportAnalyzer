@@ -13,6 +13,8 @@ namespace ReportAnalyzer
         private HashSet<string> setOfDates = new HashSet<string>();
         private HashSet<string> setOfCC = new  HashSet<string>();
         private HashSet<string> setOfSelectedDates = new HashSet<string>();
+        const double treshold = 1.1;
+        const double marza= 1.15;
 
         private List<Tuple<DateTime, string, double, string, string>> empList = new List<Tuple<DateTime, string, double, string, string>>();
         private List<Tuple<DateTime, string, double, string, string>> trackerList = new List<Tuple<DateTime, string, double, string, string>>();
@@ -49,7 +51,7 @@ namespace ReportAnalyzer
 
         }
 
-        public void temp_list_data()
+        private void temp_list_data()
         {
             CreateDataSets();
             foreach (string a in setOfNames)
@@ -64,7 +66,7 @@ namespace ReportAnalyzer
             }
 
         }
-        public void test_2()
+        private void test_2()
         {
             List<Tuple<string, string, double, string>> aa = new List<Tuple<string, string, double, string>>();
             List<Tuple<string, string, double, string>> bb = new List<Tuple<string, string, double, string>>();
@@ -76,7 +78,7 @@ namespace ReportAnalyzer
             
 
         }
-        public void check()
+        public void CompareEmpAndTra()
         {
             //sumuje czasy , tworzy liste bez duplikatow w danym dniu
             double trackerTime = new double();
@@ -88,38 +90,96 @@ namespace ReportAnalyzer
                 {
                     foreach (string cc in setOfCC)
                     {
-                        List<Tuple<string, string, double, string>> trackerList = new List<Tuple<string, string, double, string>>();
-                        List<Tuple<string, string, double, string>> empList = new List<Tuple<string, string, double, string>>();
-                        trackerTime = 0;
-                        empTime = 0;
-                        trackerList = GetSubListForGivenDate(date, GetSubListForGivenEmployee(employee, GetSubListForGivenCC(cc, summarizedTrackerList)));
-                        empList = GetSubListForGivenDate(date, GetSubListForGivenEmployee(employee, GetSubListForGivenCC(cc, summarizedEmpList)));
-                        //var empRecord = new Tuple<string, string, double, string>();
-                        // var trackerRecord;
-                        if (trackerList.Any())
-                        {
-                            //trackerRecord = trackerList.First();
-                            trackerTime = trackerList.First().Item3;
-                        }
-                        if (empList.Any())
-                        {
-                            //empRecord = empList.First();
-                            //empTime = empRecord.Item3;
-                            empTime = empList.First().Item3;
-                        }
+                        if (cc!= "Engineering")
+                        { 
+                            List<Tuple<string, string, double, string>> internaltrackerList = new List<Tuple<string, string, double, string>>();
+                            List<Tuple<string, string, double, string>> internalempList = new List<Tuple<string, string, double, string>>();
+                            trackerTime = 0;
+                            empTime = 0;
+                            internaltrackerList = GetSubListForGivenDate(date, GetSubListForGivenEmployee(employee, GetSubListForGivenCC(cc, summarizedTrackerList)));
+                            internalempList = GetSubListForGivenDate(date, GetSubListForGivenEmployee(employee, GetSubListForGivenCC(cc, summarizedEmpList)));
+                            //var empRecord = new Tuple<string, string, double, string>();
+                            // var trackerRecord;
+                            if (internaltrackerList.Any())
+                            {
+                                //trackerRecord = trackerList.First();
+                                trackerTime = internaltrackerList.First().Item3;
+                                //trackerTime = Math.Ceiling(trackerTime);
+                            }
+                            if (internalempList.Any())
+                            {
+                                //empRecord = empList.First();
+                                //empTime = empRecord.Item3;
+                                empTime = internalempList.First().Item3;
+                                empTime = Math.Round(empTime, 2);
+                            }
 
-                        if (empTime>trackerTime)
-                        {
-                            logger.LogOnScreen(empList.First().Item1 + " "+ empList.First().Item2 + " " + empList.First().Item4  + empTime.ToString() + ">" + trackerTime.ToString()+"\n");
-                        }
+                            if (empTime>trackerTime*treshold)
+                            {
+                                logger.LogOnScreen("E\tEMP>TRA\t"+internalempList.First().Item1 + "\t"+ internalempList.First().Item2 + "\t" + internalempList.First().Item4  +"\t"+ empTime.ToString() + ">" + trackerTime.ToString()+"\n");
 
+                            }
+                            if (empTime == 0 && trackerTime>0)
+                            {
+                                logger.LogOnScreen("W\tEMP=0, TRA>0\t" + internaltrackerList.First().Item1 + "\t" + internaltrackerList.First().Item2 + "\t" + internaltrackerList.First().Item4 + "\tEMP=0 TRA=" + trackerTime.ToString() + "\n");
+                            }
+                        }
 
 
                     }
                 }
             }
+            logger.LogOnScreen("done check");
+
         }
-        public List<Tuple<string, string, double, string>> GetSummarizedTime(List<Tuple<DateTime, string, double, string, string>> recordList, string date, string cc, string employee)
+
+        public void CreatePOReport ()
+        {
+            foreach(string employee in setOfNames)
+            {
+                List<Tuple<string, double>> summarizedEmpCCList = new List<Tuple<string, double>>();
+                List<Tuple<string, double>> summarizedTraList = new List<Tuple<string, double>>();
+                summarizedEmpCCList = GetListOfSummarizedTimes(GetSubListForGivenEmployee(employee, summarizedEmpList));
+                summarizedTraList = GetListOfSummarizedTimes(GetSubListForGivenEmployee(employee, summarizedTrackerList));
+                foreach(string cc in setOfCC)
+                {
+                    double empTime = new double();
+                    double traTime = new double();
+                    double finalTime = new double();
+                    foreach (Tuple<string, double> empRecord in summarizedEmpCCList)
+                    {
+                        if (cc== empRecord.Item1)
+                        {
+                            empTime = empRecord.Item2;
+                        }
+                    }
+                    foreach (Tuple<string, double> traRecord in summarizedTraList)
+                    {
+                        if (cc == traRecord.Item1)
+                        {
+                            traTime = traRecord.Item2;
+                        }
+                    }
+
+                    if (empTime*marza>traTime)
+                    {
+                        finalTime = empTime * marza;
+                    }
+                    else
+                    {
+                        finalTime = traTime;
+                    }
+                    if (finalTime > 0)
+                    {
+                        logger.LogOnScreen($"{employee}\t{cc}\t{empTime}\t{traTime}\t{finalTime}\n");
+                    }
+                }
+
+                
+            }
+            
+        }
+        public List<Tuple<string, string, double, string>> GetSummarizedTimeForSpecificDateCCEmployee(List<Tuple<DateTime, string, double, string, string>> recordList, string date, string cc, string employee)
         {
             //CreateDataSets();
             List<Tuple<string, string, double, string>> ReportCCList = new List<Tuple<string, string, double, string>>();
@@ -138,6 +198,32 @@ namespace ReportAnalyzer
             return ReportCCList;
 
         }
+        public List<Tuple<string, double>> GetListOfSummarizedTimes(List<Tuple<string, string, double, string>> recordList)
+        {
+            //CreateDataSets();
+            List<Tuple<string, double>> summarizedCCList = new List<Tuple<string, double>>();
+            //double sum = new double();
+            foreach(string cc in setOfCC)
+            {
+                double sum = new double();
+                foreach (Tuple<string, string, double, string> recordLine in recordList)
+                {
+                    if (cc.Trim().ToUpper() == recordLine.Item2.Trim().ToUpper())
+                    {
+                        sum = sum + recordLine.Item3;
+                    }
+                }
+                if (sum>0)
+                {
+                    summarizedCCList.Add(Tuple.Create(cc.Trim().ToUpper(), sum));
+                }
+            
+            }
+            return summarizedCCList;
+
+        }
+
+
         private void CreateSummarizedList(List<Tuple<DateTime, string, double, string, string>> recordList, List<Tuple<string, string, double, string>> targetSummarizedList)
         {
             //sumuje czasy , tworzy liste bez duplikatow w danym dniu

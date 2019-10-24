@@ -152,7 +152,7 @@ namespace ReportAnalyzer
             DateTime date;
             string cc;
             string project;
-            string jobType;
+            //string jobType;
             double time;
             string employee;
             if (!trackerWs.Row(rowNumber).Cell(1).IsEmpty())

@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataAnalyzer.cs" />
+    <Compile Include="DataSets.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

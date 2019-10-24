@@ -17,52 +17,90 @@ namespace ReportAnalyzer
         public Form1()
         {
             InitializeComponent();
+
+            SelectProductionEng();
+            
+            //FillListOfEmployeeToCHeck(); ;
+
+
+        }
+        
+
+        private void SelectProductionEng()
+        {
+            UINameList.SetItemChecked(0, true); //Alicja Marglewska
+            UINameList.SetItemChecked(1, true); //Blazej Agacinski
+            UINameList.SetItemChecked(2, true); //Dawid Marchlewicz
+            UINameList.SetItemChecked(3, true); //Malgorzata Marcysiak
+            UINameList.SetItemChecked(4, true); //Pawel Sochal
+            UINameList.SetItemChecked(5, true); //Przemyslaw Nejman
+            UINameList.SetItemChecked(6, true); //Radoslaw Domian
+            UINameList.SetItemChecked(7, true); //Slawomir Jasiecki
+            UINameList.SetItemChecked(8, true); //Szymon Kaszak
+            UINameList.SetItemChecked(9, true); //Szymon Kobylinski
+            UINameList.SetItemChecked(10, true); //Tomasz Tojek
+            UINameList.SetItemChecked(11, true); //Wojciech Mamel
+
         }
 
-        private void button2_Click(object sender, EventArgs e)
-        {
-                    }
 
         public void OnMsgToDisplay(Object sender, string message)
         {
             textBox1.AppendText(message);
         }
-        private void button1_Click(object sender, EventArgs e)
+        private List<string> DateRangeToList(DateTime startdate, DateTime enddate)
+        {
+            List<string> selectedDates = new List<string>();
+            for (DateTime date = startdate; date <= enddate; date = date.AddDays(1))
+            {
+                selectedDates.Add(date.ToShortDateString());
+            }
+            return selectedDates;
+        }
+
+        private void UIButtonCompareEMPnTRA_Click(object sender, EventArgs e)
         {
 
-
+            List<string> employeeListToCheck = new List<string>();
+            employeeListToCheck = UINameList.CheckedItems.OfType<string>().ToList();
+            List<string> selectedDates = new List<string>();
+            selectedDates = DateRangeToList(UIdateTimePickerStart.Value.Date, UIdateTimePickerEnd.Value.Date);
             Logger logger = new Logger();
+            Writer writer = new Writer(logger);
+            writer.SetFilename("Comparison_report_"+ DateTime.Today.ToShortDateString().Replace("\\", "_"));
+            writer.SetPath(textBoxPath.Text);
             ReportReader ReportReader = new ReportReader(logger);
             logger.passMsgToDisplay += OnMsgToDisplay;
             //logger.LogOnScreen("Start");
             ReportReader.LoadReports(textBoxTracker.Text, textBoxEmp.Text);
-            DataAnalyzer dataAnalyzer = new DataAnalyzer(ReportReader.EmpRecords, ReportReader.TrackerRecords, logger);
+            DataAnalyzer dataAnalyzer = new DataAnalyzer(ReportReader.EmpRecords, ReportReader.TrackerRecords, employeeListToCheck, selectedDates, logger, writer);
             //dataAnalyzer.test_2();
+
             dataAnalyzer.CompareEmpAndTra();
-            //dataAnalyzer.temp_list_data();
-            //dataAnalyzer.ReportCCEmp("Engineering");
-            //foreach (Tuple<DateTime, string, string, string, double, string> a in ReportReader.TrackerRecords)
-            // {
-            //textBox1.AppendText(a.Item1.ToString()+"\n");
-            //textBox1.AppendText(a.Item2.ToString() + "\n");
-            //textBox1.AppendText(a.Item3.ToString() + "\n");
-            //textBox1.AppendText(a.Item4.ToString() + "\n");
-            //textBox1.AppendText(a.Item5.ToString() + "\n");
-            //textBox1.AppendText(a.Item6.ToString() + "\n");
-            // }
-            // textBox1.AppendText(ReportReader.TrackerRecords.ToString());
-            //logger.LogOnScreen("Done");
         }
 
-        private void button2_Click_1(object sender, EventArgs e)
+        private void UIButtonCreatePOReport_Click_1(object sender, EventArgs e)
         {
+            List<string> employeeListToCheck = new List<string>();
+            employeeListToCheck = UINameList.CheckedItems.OfType<string>().ToList();
+            List<string> selectedDatesF = new List<string>();
+            selectedDatesF = DateRangeToList(UIdateTimePickerStart.Value.Date, UIdateTimePickerEnd.Value.Date);
+            MessageBox.Show(UIdateTimePickerStart.Value.Date.ToShortDateString() + "  " + UIdateTimePickerEnd.Value.Date.ToShortDateString());
+            //prepares the list of user to check, other user will not be taken into consideration
             Logger logger = new Logger();
+            Writer writer = new Writer(logger);
+            writer.SetFilename("PO_report_"+ DateTime.Today.ToShortDateString().Replace("\\", "_"));
+            writer.SetPath(textBoxPath.Text);
             ReportReader ReportReader = new ReportReader(logger);
             logger.passMsgToDisplay += OnMsgToDisplay;
             //logger.LogOnScreen("Start");
             ReportReader.LoadReports(textBoxTracker.Text, textBoxEmp.Text);
-            DataAnalyzer dataAnalyzer = new DataAnalyzer(ReportReader.EmpRecords, ReportReader.TrackerRecords, logger);
+            DataAnalyzer dataAnalyzer = new DataAnalyzer(ReportReader.EmpRecords, ReportReader.TrackerRecords, employeeListToCheck, selectedDatesF, logger, writer);
             dataAnalyzer.CreatePOReport();
+            
+            
         }
+
+ 
     }
 }
